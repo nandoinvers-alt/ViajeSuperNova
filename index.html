@@ -2,398 +2,175 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViajeSuperNova</title>
-    <script type="text/javascript" src="https://www.gstatic.com/admob/js/admob_web_sdk.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ViajeSuperNova Pro</title>
+    <script async src="https://www.gstatic.com/admob/js/admob_web_sdk.js"></script>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom, #000011, #000033);
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
+            margin: 0; padding: 0; background: #000;
+            font-family: 'Arial', sans-serif; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-        #game-container {
-            position: relative;
-            width: 90vw;
-            height: 90vh;
-            max-width: 800px;
-            max-height: 600px;
-            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgODAwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxwYXR0ZXJuIGlkPSJzdGFycyIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIj4KICAgICAgPGNpcmNsZSBjeD0iMTUiIGN5PSIxNSIgcj0iMSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOCIvPgogICAgICA8Y2lyY2xlIGN4PSI0NSIgY3k9IjM1IiByPSIxLjUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjYiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iYmxhY2siLz4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3N0YXJzKSIvPgo8L3N2Zz4K') repeat;
-            border: 2px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        #game-area {
+            position: relative; width: 100vw; height: 100vh;
+            max-width: 800px; max-height: 600px;
+            background: radial-gradient(circle, #000033 0%, #000 100%);
+            border: 2px solid #333; overflow: hidden;
         }
         #ship {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #00ff00, #00aa00);
+            position: absolute; bottom: 50px; left: 50%;
+            width: 40px; height: 40px; background: #00ff00;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            box-shadow: 0 0 10px #00ff00;
-            display: none; /* Oculto al inicio */
+            transform: translateX(-50%); transition: left 0.1s;
         }
         .meteor {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, #ff4500, #8b0000);
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ff4500;
+            position: absolute; width: 35px; height: 35px;
+            background: #ff4500; border-radius: 50%; box-shadow: 0 0 10px #ff4500;
+        }
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        #score {
+            position: absolute; top: 20px; left: 20px; color: #fff; font-size: 24px;
         }
         #game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff0000;
-            font-size: 48px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #ff0000;
-            display: none;
-            text-align: center;
+            display: none; pointer-events: auto; text-align: center;
+            background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; border: 2px solid #ff0000;
         }
-        #revive-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #00ff00;
-            color: #000;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 5px;
+        h1 { color: #ff0000; margin: 0; }
+        button {
+            margin-top: 20px; padding: 15px 30px; font-size: 20px;
+            background: #00ff00; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;
         }
-        #start-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 48px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #fff;
-            text-align: center;
-            /* display: flex; /* Asegurarse de que esté visible al inicio */
-            /* flex-direction: column; */ 
+        /* Botones para celular */
+        .touch-controls {
+            position: absolute; bottom: 20px; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 20px;
+            box-sizing: border-box; pointer-events: auto;
         }
-        #start-btn {
-            margin-top: 20px;
-            padding: 15px 30px;
-            background: #00ff00;
-            color: #000;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            border-radius: 10px;
-        }
-        /* La lógica de AdMob se ha eliminado por simplicidad y error de sintaxis */
-        #ad-modal { display: none; }
-        #score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #fff;
-            font-size: 24px;
-            font-weight: bold;
-            display: none; /* Oculto al inicio */
-        }
-        #left-control, #right-control {
-            position: absolute;
-            bottom: 0; /* Ubicar en la parte inferior para no interferir con el contenido */
-            width: 50%;
-            height: 100%; 
-            opacity: 0; 
-            z-index: 5;
-        }
-        #left-control {
-            left: 0;
-        }
-        #right-control {
-            right: 0;
-        }
-        /* Ajustes de Responsive Media Query */
-        @media (max-width: 820px) {
-            #game-container {
-                width: 100vw;
-                height: 100vh;
-                max-width: none;
-                max-height: none;
-            }
-            #ship {
-                width: 30px;
-                height: 30px;
-            }
-            .meteor {
-                width: 20px;
-                height: 20px;
-            }
-            #game-over {
-                font-size: 36px;
-            }
-            #revive-btn {
-                font-size: 16px;
-                padding: 8px 16px;
-            }
-            #start-screen {
-                font-size: 36px;
-            }
-            #start-btn {
-                font-size: 20px;
-                padding: 12px 24px;
-            }
-            #score {
-                font-size: 18px;
-            }
+        .t-btn {
+            width: 80px; height: 80px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 30px; user-select: none; -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="start-screen">
-            ViajeSuperNova
-            <br>
-            <button id="start-btn">Empezar a Jugar</button>
-        </div>
 
-        <div id="ship"></div>
-        <div id="score">Puntuación: 0</div>
-        
-        <div id="game-over">
-            ¡Juego Terminado!
-            <br>
-            <button id="revive-btn">Jugar de nuevo</button>
-        </div>
-        
-        <div id="left-control"></div>
-        <div id="right-control"></div>
-    </div>
+<div id="game-area">
+    <div id="ship"></div>
+    <div id="score">Puntos: 0</div>
     
-    <div id="ad-modal">
-        <div id="ad-content">
-            <h2>Anuncio Simulado</h2>
-            <div id="ad-banner"></div>
-            <br>
-            <button id="close-ad-btn">Cerrar y Revivir</button>
+    <div id="ui-layer">
+        <div id="game-over">
+            <h1>¡CRASH!</h1>
+            <button id="revive-btn">REVIVIR CON ANUNCIO</button>
         </div>
     </div>
 
-    <script>
-        const gameContainer = document.getElementById('game-container');
-        const ship = document.getElementById('ship');
-        const gameOver = document.getElementById('game-over');
-        const reviveBtn = document.getElementById('revive-btn');
-        const startScreen = document.getElementById('start-screen');
-        const startBtn = document.getElementById('start-btn');
-        const scoreDisplay = document.getElementById('score');
-        const leftControl = document.getElementById('left-control');
-        const rightControl = document.getElementById('right-control');
+    <div class="touch-controls">
+        <div class="t-btn" id="left-btn">◀</div>
+        <div class="t-btn" id="right-btn">▶</div>
+    </div>
+</div>
 
-        let shipX = 0; // Se inicializará correctamente en resetGame
-        let shipSpeed = 5;
-        let meteors = [];
-        let gameRunning = false;
-        let score = 0;
-        let meteorInterval;
-        let animationFrameId; // Usaremos requestAnimationFrame para mejor rendimiento
+<script>
+    // --- CONFIGURACIÓN ADMOB ---
+    const AD_DATA = {
+        appId: 'ca-app-pub-2815339143145958~3548728658',
+        unitId: 'ca-app-pub-2815339143145958/2155755939'
+    };
 
-        let moveLeft = false;
-        let moveRight = false;
+    let gameRunning = true;
+    let score = 0;
+    let shipX = 50; // Porcentaje
+    let meteors = [];
+    const ship = document.getElementById('ship');
+    const scoreText = document.getElementById('score');
+    const gameOverScreen = document.getElementById('game-over');
+    const reviveBtn = document.getElementById('revive-btn');
+
+    // Movimiento
+    function moveLeft() { if(shipX > 5) shipX -= 7; updateShip(); }
+    function moveRight() { if(shipX < 95) shipX += 7; updateShip(); }
+    function updateShip() { ship.style.left = shipX + '%'; }
+
+    // Teclado
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowLeft") moveLeft();
+        if(e.key === "ArrowRight") moveRight();
+    });
+
+    // Touch
+    document.getElementById('left-btn').addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft(); });
+    document.getElementById('right-btn').addEventListener('touchstart', (e) => { e.preventDefault(); moveRight(); });
+
+    function createMeteor() {
+        if(!gameRunning) return;
+        const m = document.createElement('div');
+        m.className = 'meteor';
+        m.style.left = Math.random() * 90 + '%';
+        m.style.top = '-50px';
+        document.getElementById('game-area').appendChild(m);
+        meteors.push({ el: m, y: -50 });
+    }
+
+    function update() {
+        if(!gameRunning) return;
+        meteors.forEach((m, i) => {
+            m.y += 5;
+            m.el.style.top = m.y + 'px';
+            
+            // Colisión
+            const sRect = ship.getBoundingClientRect();
+            const mRect = m.el.getBoundingClientRect();
+            if(!(mRect.right < sRect.left || mRect.left > sRect.right || mRect.bottom < sRect.top || mRect.top > sRect.bottom)) {
+                gameRunning = false;
+                gameOverScreen.style.display = 'block';
+            }
+
+            if(m.y > window.innerHeight) {
+                m.el.remove();
+                meteors.splice(i, 1);
+                score++;
+                scoreText.innerText = 'Puntos: ' + score;
+            }
+        });
+        requestAnimationFrame(update);
+    }
+
+    function revive() {
+        meteors.forEach(m => m.el.remove());
+        meteors = [];
+        gameRunning = true;
+        gameOverScreen.style.display = 'none';
+        update();
+    }
+
+    // --- LÓGICA DEL BOTÓN CORREGIDA ---
+    reviveBtn.onclick = function() {
+        console.log("Intentando revivir...");
         
-        // --- Funciones del Juego ---
-
-        function resetGame() {
-            // Limpiar meteoritos existentes
-            meteors.forEach(meteor => meteor.element.remove());
-            meteors = [];
-            
-            // Posición inicial de la nave
-            shipX = gameContainer.offsetWidth / 2 - (ship.offsetWidth / 2);
-            ship.style.left = shipX + 'px';
-            ship.style.bottom = '20px';
-            
-            // Reiniciar puntuación
-            score = 0;
-            scoreDisplay.textContent = 'Puntuación: 0';
-
-            // Ocultar pantallas
-            gameOver.style.display = 'none';
-            startScreen.style.display = 'none';
-            
-            // Mostrar elementos de juego
-            ship.style.display = 'block';
-            scoreDisplay.style.display = 'block';
-
-            gameRunning = true;
-            
-            // Iniciar generación de meteoritos y animación
-            meteorInterval = setInterval(createMeteor, 1000);
-            gameLoop(); // Iniciar bucle de animación
+        // Si AdMob existe y carga, lo mostramos
+        if (window.admob && admob.interstitial) {
+            admob.interstitial.load({ adUnitId: AD_DATA.unitId })
+                .then(() => admob.interstitial.show())
+                .then(() => revive())
+                .catch(err => {
+                    console.log("Fallo anuncio, reviviendo igual");
+                    revive();
+                });
+        } else {
+            // Si no hay AdMob, el botón FUNCIONA de todos modos
+            revive();
         }
+    };
 
-        function endGame() {
-            if (!gameRunning) return;
+    setInterval(createMeteor, 1000);
+    update();
+</script>
 
-            gameRunning = false;
-            gameOver.style.display = 'block';
-            
-            clearInterval(meteorInterval);
-            cancelAnimationFrame(animationFrameId);
-            
-            ship.style.display = 'none';
-            scoreDisplay.style.display = 'none';
-            
-            // Quitar listeners de movimiento por si se quedaron activos
-            moveLeft = false;
-            moveRight = false;
-        }
-
-        function createMeteor() {
-            if (!gameRunning) return;
-            const meteor = document.createElement('div');
-            meteor.classList.add('meteor');
-            
-            // Obtener el ancho del contenedor en el momento de la creación
-            const containerWidth = gameContainer.offsetWidth; 
-            const meteorSize = meteor.offsetWidth || 30; // 30px es el tamaño por defecto
-            
-            meteor.style.left = Math.random() * (containerWidth - meteorSize) + 'px';
-            meteor.style.top = '-30px';
-            gameContainer.appendChild(meteor);
-            meteors.push({ element: meteor, y: -30 });
-        }
-        
-        // Bucle principal de juego usando requestAnimationFrame
-        function gameLoop() {
-            if (!gameRunning) return;
-
-            // 1. Mover Nave (Movimiento continuo)
-            if (moveLeft && shipX > 0) {
-                shipX = Math.max(0, shipX - shipSpeed);
-            }
-            // 40 es el ancho por defecto de la nave
-            if (moveRight && shipX < gameContainer.offsetWidth - (ship.offsetWidth || 40)) {
-                shipX = Math.min(gameContainer.offsetWidth - (ship.offsetWidth || 40), shipX + shipSpeed);
-            }
-            ship.style.left = shipX + 'px';
-
-            // 2. Animar Meteoritos y Colisiones
-            const shipRect = ship.getBoundingClientRect();
-            
-            for (let i = meteors.length - 1; i >= 0; i--) {
-                const meteor = meteors[i];
-                meteor.y += 3;
-                meteor.element.style.top = meteor.y + 'px';
-
-                const meteorRect = meteor.element.getBoundingClientRect();
-                
-                // Colisión (Solo verificar si el juego está corriendo)
-                if (gameRunning && 
-                    meteorRect.bottom >= shipRect.top &&
-                    meteorRect.top <= shipRect.bottom &&
-                    meteorRect.right >= shipRect.left &&
-                    meteorRect.left <= shipRect.right) {
-                    endGame();
-                    return; // Salir del bucle después del fin del juego
-                }
-
-                // Remover meteoritos fuera de pantalla y actualizar score
-                if (meteor.y > gameContainer.offsetHeight) {
-                    meteor.element.remove();
-                    meteors.splice(i, 1);
-                    if (gameRunning) {
-                        score++;
-                        scoreDisplay.textContent = 'Puntuación: ' + score;
-                    }
-                }
-            }
-            
-            // 3. Solicitar el próximo frame
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
-        
-        // --- Event Listeners ---
-
-        // 1. Botón de Inicio
-        startBtn.addEventListener('click', resetGame);
-        reviveBtn.addEventListener('click', resetGame); // Usar revivir para jugar de nuevo
-
-        // 2. Movimiento con Teclado (Para laptops/escritorio)
-        document.addEventListener('keydown', (e) => {
-            if (!gameRunning) return;
-            if (e.key === 'ArrowLeft') {
-                moveLeft = true;
-            } else if (e.key === 'ArrowRight') {
-                moveRight = true;
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (!gameRunning) return;
-            if (e.key === 'ArrowLeft') {
-                moveLeft = false;
-            } else if (e.key === 'ArrowRight') {
-                moveRight = false;
-            }
-        });
-        
-        // 3. Movimiento Táctil/Mouse (Para Laptops/Teléfonos)
-        
-        // Movimiento Izquierda
-        leftControl.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            if (gameRunning) moveLeft = true;
-        });
-        leftControl.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (gameRunning) moveLeft = true;
-        });
-        
-        // Detener Movimiento Izquierda
-        leftControl.addEventListener('mouseup', () => { moveLeft = false; });
-        leftControl.addEventListener('mouseleave', () => { moveLeft = false; });
-        leftControl.addEventListener('touchend', () => { moveLeft = false; });
-
-        // Movimiento Derecha
-        rightControl.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            if (gameRunning) moveRight = true;
-        });
-        rightControl.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (gameRunning) moveRight = true;
-        });
-
-        // Detener Movimiento Derecha
-        rightControl.addEventListener('mouseup', () => { moveRight = false; });
-        rightControl.addEventListener('mouseleave', () => { moveRight = false; });
-        rightControl.addEventListener('touchend', () => { moveRight = false; });
-        
-        // También considera detener el movimiento si el toque se sale del contenedor (body)
-        document.addEventListener('mouseup', () => { moveLeft = false; moveRight = false; });
-        document.addEventListener('touchend', () => { moveLeft = false; moveRight = false; });
-        
-        // Inicializar la posición de la nave y el ancho del contenedor cuando la página cargue
-        window.addEventListener('load', () => {
-            // Solo se inicializa la posición, el display:none evita que se vea.
-            shipX = gameContainer.offsetWidth / 2 - (ship.offsetWidth / 2);
-            ship.style.left = shipX + 'px';
-        });
-
-        // Reajustar la posición de la nave si el tamaño de la ventana cambia (importante para móviles)
-        window.addEventListener('resize', () => {
-            if (gameRunning) {
-                shipX = gameContainer.offsetWidth / 2 - (ship.offsetWidth / 2);
-                ship.style.left = shipX + 'px';
-            }
-        });
-
-    </script>
 </body>
 </html>
