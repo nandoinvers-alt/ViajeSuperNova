@@ -3,44 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ViajeSuperNova - AutoPlay</title>
+    <title>ViajeSuperNova - Monetizado</title>
     <script async src="https://www.gstatic.com/admob/js/admob_web_sdk.js"></script>
     <style>
-        body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #game-area { position: relative; width: 100vw; height: 100vh; max-width: 800px; max-height: 600px; background: #000022; border: 2px solid #333; overflow: hidden; }
-        #ship { position: absolute; bottom: 80px; left: 50%; width: 40px; height: 40px; background: #00ff00; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: translateX(-50%); }
-        .meteor { position: absolute; width: 35px; height: 35px; background: #ff4500; border-radius: 50%; box-shadow: 0 0 10px #ff4500; }
-        #score { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 24px; z-index: 10; }
-        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 30px; text-align: center; display: none; z-index: 20; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; }
-        .touch-controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; }
-        .t-btn { width: 70px; height: 70px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 30px; user-select: none; }
+        body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; }
+        #game-area { position: relative; width: 100vw; height: 85vh; max-width: 800px; background: radial-gradient(circle, #000033 0%, #000 100%); border: 2px solid #333; overflow: hidden; }
+        #ship { position: absolute; bottom: 20px; left: 50%; width: 40px; height: 40px; background: #00ff00; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: translateX(-50%); transition: left 0.1s; }
+        .meteor { position: absolute; width: 30px; height: 30px; background: #ff4500; border-radius: 50%; box-shadow: 0 0 10px #ff4500; }
+        #score { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 24px; font-weight: bold; z-index: 10; }
+        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 28px; text-align: center; display: none; z-index: 20; background: rgba(0,0,0,0.8); padding: 20px; border: 2px solid #00ff00; border-radius: 10px; }
+        /* Área para el Banner de AdMob */
+        #ad-banner-container { width: 100%; height: 15vh; background: #111; display: flex; justify-content: center; align-items: center; color: #444; font-size: 12px; border-top: 2px solid #333; }
+        /* Controles táctiles */
+        .touch-zone { position: absolute; bottom: 0; width: 100%; height: 100px; display: flex; justify-content: space-between; pointer-events: none; }
+        .t-btn { pointer-events: auto; width: 100px; height: 100px; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; color: white; font-size: 40px; user-select: none; }
     </style>
 </head>
 <body>
 
 <div id="game-area">
     <div id="score">Puntos: 0</div>
-    <div id="msg">¡CHOQUE!<br>Reiniciando...</div>
+    <div id="msg">¡NAVE DESTRUIDA!<br><span style="font-size: 18px;">Cargando anuncio y reiniciando...</span></div>
     <div id="ship"></div>
-    <div class="touch-controls">
-        <div class="t-btn" id="left-btn">◀</div>
-        <div class="t-btn" id="right-btn">▶</div>
+    
+    <div class="touch-zone">
+        <div class="t-btn" id="l-btn">◀</div>
+        <div class="t-btn" id="r-btn">▶</div>
     </div>
 </div>
 
+<div id="ad-banner-container">
+    <div id="ad-slot">Espacio para Publicidad</div>
+</div>
+
 <script>
-    const AD_DATA = { appId: 'ca-app-pub-2815339143145958~3548728658', unitId: 'ca-app-pub-2815339143145958/2155755939' };
-    if (window.admob) { admob.init({ appId: AD_DATA.appId }); }
+    // IDs de AdMob
+    const AD_CONFIG = {
+        appId: 'ca-app-pub-2815339143145958~3548728658',
+        interstitialId: 'ca-app-pub-2815339143145958/2155755939'
+    };
+
+    // Inicializar AdMob
+    if (window.admob) {
+        admob.init({ appId: AD_CONFIG.appId });
+        // Cargar Banner automáticamente
+        admob.banner.show({ id: 'ca-app-pub-2815339143145958/2155755939' }); // Usando tu ID disponible
+    }
 
     let score = 0, shipX = 50, gameRunning = true, meteors = [];
     const ship = document.getElementById('ship'), scoreText = document.getElementById('score'), msg = document.getElementById('msg');
 
-    function move(dir) { if(!gameRunning) return; shipX += dir; if(shipX<5) shipX=5; if(shipX>95) shipX=95; ship.style.left = shipX + '%'; }
+    function move(dir) { 
+        if(!gameRunning) return; 
+        shipX += dir; 
+        if(shipX < 5) shipX = 5; 
+        if(shipX > 95) shipX = 95; 
+        ship.style.left = shipX + '%'; 
+    }
     
-    // Controles
-    document.addEventListener('keydown', (e) => { if(e.key==="ArrowLeft") move(-8); if(e.key==="ArrowRight") move(8); });
-    document.getElementById('left-btn').ontouchstart = (e) => { e.preventDefault(); move(-10); };
-    document.getElementById('right-btn').ontouchstart = (e) => { e.preventDefault(); move(10); };
+    // Controles teclado
+    document.addEventListener('keydown', (e) => { if(e.key==="ArrowLeft") move(-7); if(e.key==="ArrowRight") move(7); });
+    // Controles touch
+    document.getElementById('l-btn').ontouchstart = (e) => { e.preventDefault(); move(-10); };
+    document.getElementById('r-btn').ontouchstart = (e) => { e.preventDefault(); move(10); };
 
     function createMeteor() {
         if(!gameRunning) return;
@@ -55,24 +80,26 @@
     function update() {
         if(!gameRunning) return;
         meteors.forEach((m, i) => {
-            m.y += 6;
+            m.y += 5;
             m.el.style.top = m.y + 'px';
             const sRect = ship.getBoundingClientRect(), mRect = m.el.getBoundingClientRect();
             if(!(mRect.right < sRect.left || mRect.left > sRect.right || mRect.bottom < sRect.top || mRect.top > sRect.bottom)) {
-                gameOver();
+                handleGameOver();
             }
             if(m.y > window.innerHeight) { m.el.remove(); meteors.splice(i, 1); score++; scoreText.innerText = 'Puntos: ' + score; }
         });
         requestAnimationFrame(update);
     }
 
-    function gameOver() {
+    function handleGameOver() {
         gameRunning = false;
         msg.style.display = 'block';
         
-        // Intento de cargar anuncio en silencio para generar datos
+        // Intentar mostrar anuncio de pantalla completa (Intersticial)
         if (window.admob && admob.interstitial) {
-            admob.interstitial.load({ adUnitId: AD_DATA.unitId }).catch(() => {});
+            admob.interstitial.load({ adUnitId: AD_CONFIG.interstitialId })
+                .then(() => admob.interstitial.show())
+                .catch(() => console.log("Anuncio en espera de aprobación de AdMob"));
         }
 
         setTimeout(() => {
@@ -85,7 +112,7 @@
             msg.style.display = 'none';
             gameRunning = true;
             update();
-        }, 2000);
+        }, 3000); // 3 segundos de pausa para el anuncio
     }
 
     setInterval(createMeteor, 1000);
