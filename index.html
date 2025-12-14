@@ -3,163 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViajeSuperNova - Juego Espacial</title>
+    <title>ViajeSuperNova</title>
+    <!-- Script oficial de Google AdMob para Web -->
     <script type="text/javascript" src="https://www.gstatic.com/admob/js/admob_web_sdk.js"></script>
     <style>
         body {
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             background: linear-gradient(to bottom, #000011, #000033);
             font-family: Arial, sans-serif;
             overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
+            width: 100vw;
         }
         #game-container {
             position: relative;
-            width: 800px; height: 600px;
-            background: #000;
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            max-height: 600px;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgODAwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxwYXR0ZXJuIGlkPSJzdGFycyIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIj4KICAgICAgPGNpcmNsZSBjeD0iMTUiIGN5PSIxNSIgcj0iMSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOCIvPgogICAgICA8Y2lyY2xlIGN4PSI0NSIgY3k9IjM1IiByPSIxLjUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjYiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iYmxhY2siLz4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3N0YXJzKSIvPgo8L3N2Zz4K') repeat;
             border: 2px solid #fff;
-            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
         #ship {
-            position: absolute; bottom: 20px; left: 50%;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
             transform: translateX(-50%);
-            width: 40px; height: 40px;
-            background: #00ff00;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ff00, #00aa00);
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
             box-shadow: 0 0 10px #00ff00;
         }
         .meteor {
-            position: absolute; width: 30px; height: 30px;
-            background: #ff4500; border-radius: 50%;
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ff4500, #8b0000);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4500;
         }
         #game-over {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            color: #ff0000; font-size: 40px; font-weight: bold;
-            display: none; text-align: center; z-index: 10;
+            color: #ff0000;
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff0000;
+            display: none;
+            text-align: center;
         }
         #revive-btn {
-            margin-top: 20px; padding: 15px 30px;
-            background: #00ff00; color: #000; border: none;
-            font-size: 20px; cursor: pointer; border-radius: 5px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #fff;
+            text-align: center;
+        }
+        #start-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        #ad-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        #ad-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        #ad-banner {
+            width: 320px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        #close-ad-btn {
+            padding: 10px 20px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
         }
         #score {
-            position: absolute; top: 10px; left: 10px;
-            color: #fff; font-size: 24px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #left-control, #right-control {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            opacity: 0; /* Invisible */
+            z-index: 5;
+        }
+        #left-control {
+            left: 0;
+        }
+        #right-control {
+            right: 0;
+        }
+        @media (max-width: 820px) {
+            #game-container {
+                width: 100vw;
+                height: 100vh;
+                max-width: none;
+                max-height: none;
+            }
+            #ship {
+                width: 30px;
+                height: 30px;
+            }
+            .meteor {
+                width: 20px;
+                height: 20px;
+            }
+            #game-over {
+                font-size: 36px;
+            }
+            #revive-btn {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+            #start-screen {
+                font-size: 36px;
+            }
+            #start-btn {
+                font-size: 20px;
+                padding: 12px 24px;
+            }
+            #score {
+                font-size: 18px;
+            }
+            #ad-banner {
+                width: 300px;
+                height: 50px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="game-container">
+        <div id="start-screen">
+            ViajeSuperNova
+            <br>
+            <button id="start-btn">Empezar a Jugar</button>
+        </div>
         <div id="ship"></div>
         <div id="score">Puntuación: 0</div>
         <div id="game-over">
-            ¡JUEGO TERMINADO!
+            ¡Juego Terminado!
             <br>
-            <button id="revive-btn">Revivir (Ver Anuncio)</button>
+            <button id="revive-btn">Ver anuncio para revivir</button>
+        </div>
+        <!-- Controles táctiles invisibles -->
+        <div id="left-control"></div>
+        <div id="right-control"></div>
+    </div>
+    <div id="ad-modal">
+        <div id="ad-content">
+            <h2>Ve este anuncio para revivir</h2>
+            <div id="ad-banner"></div>
+            <br>
+            <button id="close-ad-btn">Cerrar y Revivir</button>
         </div>
     </div>
 
     <script>
-        // Códigos de AdMob proporcionados
-        const APP_ID = 'ca-app-pub-2815339143145958~3548728658';
-        const AD_UNIT_ID = 'ca-app-pub-2815339143145958/2155755939';
-
-        // Intentar inicializar AdMob si está disponible
-        if (typeof admob !== 'undefined') {
-            admob.init({ appId: APP_ID });
-        }
+        // Inicializar AdMob
+        admob.init({
+            appId: 'ca-app-pub-2815339143145958~3548728658'
+        });
 
         const gameContainer = document.getElementById('game-container');
         const ship = document.getElementById('ship');
         const gameOver = document.getElementById('game-over');
         const reviveBtn = document.getElementById('revive-btn');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const adModal = document.getElementById('ad-modal');
+        const closeAdBtn = document.getElementById('close-ad-btn');
+        const adBanner = document.getElementById('ad-banner');
         const scoreDisplay = document.getElementById('score');
+        const leftControl = document.getElementById('left-control');
+        const rightControl = document.getElementById('right-control');
 
-        let shipX = 380;
+        let shipX = gameContainer.offsetWidth / 2 - 20;
+        let shipSpeed = 5;
         let meteors = [];
-        let gameRunning = true;
+        let gameRunning = false;
         let score = 0;
         let meteorInterval;
+        let animationInterval;
 
-        // Movimiento
+        // Empezar juego
+        startBtn.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            gameRunning = true;
+            meteorInterval = setInterval(createMeteor, 1000);
+            animationInterval = setInterval(animateMeteors, 16); // ~60fps
+        });
+
+        // Movimiento de la nave con teclado
         document.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
-            if (e.key === 'ArrowLeft' && shipX > 0) shipX -= 20;
-            if (e.key === 'ArrowRight' && shipX < 760) shipX += 20;
+            if (e.key === 'ArrowLeft' && shipX > 0) {
+                shipX -= shipSpeed;
+            } else if (e.key === 'ArrowRight' && shipX < gameContainer.offsetWidth - 40) {
+                shipX += shipSpeed;
+            }
             ship.style.left = shipX + 'px';
         });
 
+        // Movimiento táctil
+        let touchStartX = null;
+        leftControl.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameRunning) return;
+            touchStartX = e.touches[0].clientX;
+            moveShipLeft();
+        });
+        rightControl.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameRunning) return;
+            touchStartX = e.touches[0].clientX;
+            moveShipRight();
+        });
+        leftControl.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!gameRunning) return;
+            moveShipLeft();
+        });
+        rightControl.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!gameRunning) return;
+            moveShipRight();
+        });
+
+        function moveShipLeft() {
+            if (shipX > 0) {
+                shipX -= shipSpeed;
+                ship.style.left = shipX + 'px';
+            }
+        }
+
+        function moveShipRight() {
+            if (shipX < gameContainer.offsetWidth - 40) {
+                shipX += shipSpeed;
+                ship.style.left = shipX + 'px';
+            }
+        }
+
+        // Generar meteoritos
         function createMeteor() {
             if (!gameRunning) return;
             const meteor = document.createElement('div');
             meteor.classList.add('meteor');
-            meteor.style.left = Math.random() * 770 + 'px';
+            meteor.style.left = Math.random() * (gameContainer.offsetWidth - 30) + 'px';
             meteor.style.top = '-30px';
             gameContainer.appendChild(meteor);
             meteors.push({ element: meteor, y: -30 });
         }
 
-        function animate() {
-            if (!gameRunning) return;
-            meteors.forEach((m, i) => {
-                m.y += 5;
-                m.element.style.top = m.y + 'px';
-                
-                // Colisión simple
-                const sRect = ship.getBoundingClientRect();
-                const mRect = m.element.getBoundingClientRect();
-                if (!(mRect.right < sRect.left || mRect.left > sRect.right || mRect.bottom < sRect.top || mRect.top > sRect.bottom)) {
+        // Animar meteoritos
+        function animateMeteors() {
+            meteors.forEach((meteor, index) => {
+                meteor.y += 3;
+                meteor.element.style.top = meteor.y + 'px';
+
+                // Verificar colisión
+                const shipRect = ship.getBoundingClientRect();
+                const meteorRect = meteor.element.getBoundingClientRect();
+                if (gameRunning && meteorRect.bottom >= shipRect.top &&
+                    meteorRect.top <= shipRect.bottom &&
+                    meteorRect.right >= shipRect.left &&
+                    meteorRect.left <= shipRect.right) {
                     endGame();
                 }
 
-                if (m.y > 600) {
-                    m.element.remove();
-                    meteors.splice(i, 1);
-                    score++;
-                    scoreDisplay.textContent = 'Puntuación: ' + score;
+                // Remover meteoritos fuera de pantalla
+                if (meteor.y > gameContainer.offsetHeight) {
+                    meteor.element.remove();
+                    meteors.splice(index, 1);
+                    if (gameRunning) {
+                        score++;
+                        scoreDisplay.textContent = 'Puntuación: ' + score;
+                    }
                 }
             });
-            requestAnimationFrame(animate);
         }
 
+        // Fin del juego
         function endGame() {
             gameRunning = false;
             gameOver.style.display = 'block';
             clearInterval(meteorInterval);
+            clearInterval(animationInterval);
         }
 
+        // Revivir
         function revive() {
-            meteors.forEach(m => m.element.remove());
+            // Limpiar meteoritos
+            meteors.forEach(meteor => meteor.element.remove());
             meteors = [];
+            // Reiniciar estado
             gameRunning = true;
             gameOver.style.display = 'none';
-            shipX = 380;
-            ship.style.left = '50%';
+            // Reiniciar intervalos
             meteorInterval = setInterval(createMeteor, 1000);
-            animate();
+            animationInterval = setInterval(animateMeteors, 16); // ~60fps
         }
 
-        // Botón con lógica de seguridad
+        // Cargar y mostrar banner de anuncio
         reviveBtn.addEventListener('click', () => {
-            if (typeof admob !== 'undefined' && admob.interstitial) {
-                // Si AdMob existe, intentamos cargar anuncio
-                admob.interstitial.load({ adUnitId: AD_UNIT_ID })
-                    .then(() => admob.interstitial.show())
-                    .then(() => revive())
-                    .catch((e) => {
-                        console.log("Anuncio no disponible aún, reviviendo...");
-                        revive();
-                    });
-            } else {
-                // Si no hay AdMob (PC o bloqueador), revivimos directo
+            adModal.style.display = 'flex';
+            admob.banner.show({
+                adUnitId: 'ca-app-pub-2815339143145958/2155755939',
+                position: 'top'
+            }).then(() => {
+                // Anuncio mostrado, esperar a que se cierre
+            }).catch((error) => {
+                console.error('Error al mostrar banner:', error);
+                // Revivir de todos modos si no carga
                 revive();
-            }
+            });
         });
 
-        meteorInterval = setInterval(createMeteor, 1000);
-        animate();
+        closeAdBtn.addEventListener('click', () => {
+            adModal.style.display = 'none';
+            admob.banner.hide();
+            revive();
+        });
     </script>
 </body>
 </html>
